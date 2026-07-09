@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,433 +8,783 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="automapper">
     <title>automapper</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-        #root { display: flex; flex-direction: column; height: 100vh; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #fff;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #fff;
+        }
+
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .header h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .prompt-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-box h2 {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .prompt-box p {
+            font-size: 0.875rem;
+            color: #1e40af;
+            margin: 0.25rem 0;
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+
+        .btn-primary {
+            background: #1e293b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-success {
+            background: white;
+            color: black;
+            border: 1px solid #e5e7eb;
+        }
+
+        .photo-preview {
+            margin-bottom: 1rem;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .photo-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        .album-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .album-item {
+            position: relative;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .album-item img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+
+        .privacy-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            padding: 2rem 1rem;
+        }
+
+        .map-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .map-item:active {
+            background: #f1f5f9;
+        }
+
+        .map-item img {
+            width: 100%;
+            height: 8rem;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-location {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .map-location-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .map-location-text p {
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+        }
+
+        .map-location-coords {
+            color: #1e293b;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .map-location-privacy {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .map-location-date {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 50;
+            align-items: flex-end;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            border-radius: 1rem 1rem 0 0;
+            padding: 1rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-header h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .slider-group {
+            margin: 1rem 0;
+        }
+
+        .slider-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #334155;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 0.5rem;
+            cursor: pointer;
+            accent-color: #1e293b;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .location-info {
+            background: #f1f5f9;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .location-info p {
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+        }
+
+        .location-label {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .location-coords {
+            color: #1e293b;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .location-accuracy {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding-top: 1rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .camera-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: black;
+            z-index: 40;
+            flex-direction: column;
+        }
+
+        .camera-modal.active {
+            display: flex;
+        }
+
+        video {
+            flex: 1;
+            object-fit: cover;
+        }
+
+        .camera-controls {
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .camera-controls button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .camera-cancel {
+            background: #475569;
+            color: white;
+        }
+
+        .camera-capture {
+            background: white;
+            color: black;
+        }
+
+        .nav {
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.125rem;
+            padding: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            border-radius: 0.375rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .nav-btn.active {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+        }
+
+        canvas {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="app">
+        <div class="header">
+            <h1>automapper</h1>
+            <p id="tz-display">Daily photo journal</p>
+        </div>
 
-    <script>
-        const { useState, useEffect, useRef } = React;
-
-        const DailyPhotoJournal = () => {
-            const [tab, setTab] = useState('today');
-            const [photos, setPhotos] = useState([]);
-            const [todayPhoto, setTodayPhoto] = useState(null);
-            const [showCamera, setShowCamera] = useState(false);
-            const [selectedPhoto, setSelectedPhoto] = useState(null);
-            const videoRef = useRef(null);
-            const canvasRef = useRef(null);
-            const [timezone, setTimezone] = useState(null);
-            const [nextPromptTime, setNextPromptTime] = useState(null);
-
-            // Initialize timezone on mount
-            useEffect(() => {
-                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                setTimezone(tz);
-                calculateNextPrompt();
-                
-                // Load photos from localStorage
-                const stored = localStorage.getItem('automapperPhotos');
-                if (stored) {
-                    setPhotos(JSON.parse(stored));
-                }
-                checkTodayPhoto();
-            }, []);
-
-            const calculateNextPrompt = () => {
-                const now = new Date();
-                const hours = now.getHours();
-                
-                let nextHour;
-                if (hours >= 22 || hours < 7) {
-                    nextHour = 7;
-                    now.setDate(now.getDate() + 1);
-                } else {
-                    nextHour = Math.floor(Math.random() * (22 - hours)) + hours + 1;
-                }
-                
-                const nextTime = new Date(now);
-                nextTime.setHours(nextHour, Math.floor(Math.random() * 60), 0);
-                setNextPromptTime(nextTime);
-            };
-
-            const checkTodayPhoto = () => {
-                const today = new Date().toDateString();
-                const stored = localStorage.getItem('automapperPhotos');
-                if (stored) {
-                    const allPhotos = JSON.parse(stored);
-                    const todayPhoto = allPhotos.find(p => new Date(p.timestamp).toDateString() === today);
-                    setTodayPhoto(todayPhoto);
-                }
-            };
-
-            const startCamera = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { facingMode: 'environment' } 
-                    });
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = stream;
-                        setShowCamera(true);
-                    }
-                } catch (err) {
-                    alert('Camera access denied. Go to Settings > Safari > Camera and allow access.');
-                }
-            };
-
-            const stopCamera = () => {
-                if (videoRef.current && videoRef.current.srcObject) {
-                    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-                }
-                setShowCamera(false);
-            };
-
-            const capturePhoto = async () => {
-                if (!canvasRef.current || !videoRef.current) return;
-
-                const ctx = canvasRef.current.getContext('2d');
-                canvasRef.current.width = videoRef.current.videoWidth;
-                canvasRef.current.height = videoRef.current.videoHeight;
-                ctx.drawImage(videoRef.current, 0, 0);
-
-                try {
-                    const position = await new Promise((resolve, reject) => {
-                        navigator.geolocation.getCurrentPosition(resolve, reject);
-                    });
-
-                    const photoData = {
-                        id: Date.now(),
-                        timestamp: new Date().toISOString(),
-                        imageData: canvasRef.current.toDataURL('image/jpeg', 0.85),
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                        accuracy: position.coords.accuracy,
-                        privacyLevel: 3,
-                    };
-
-                    const updated = [...photos, photoData];
-                    setPhotos(updated);
-                    localStorage.setItem('automapperPhotos', JSON.stringify(updated));
-                    setTodayPhoto(photoData);
-                    stopCamera();
-                    calculateNextPrompt();
-                    alert('Photo captured!');
-                } catch (err) {
-                    alert('Location access denied. Enable in Settings > Safari > Location.');
-                }
-            };
-
-            const updatePrivacy = (photoId, level) => {
-                const updated = photos.map(p => 
-                    p.id === photoId ? { ...p, privacyLevel: level } : p
-                );
-                setPhotos(updated);
-                localStorage.setItem('automapperPhotos', JSON.stringify(updated));
-                if (selectedPhoto && selectedPhoto.id === photoId) {
-                    setSelectedPhoto({ ...selectedPhoto, privacyLevel: level });
-                }
-            };
-
-            const deletePhoto = (photoId) => {
-                const updated = photos.filter(p => p.id !== photoId);
-                setPhotos(updated);
-                localStorage.setItem('automapperPhotos', JSON.stringify(updated));
-                setSelectedPhoto(null);
-            };
-
-            const blurLocation = (lat, lng, privacyLevel) => {
-                const blurAmount = (6 - privacyLevel) * 0.1;
-                return {
-                    lat: parseFloat((lat + (Math.random() - 0.5) * blurAmount).toFixed(4)),
-                    lng: parseFloat((lng + (Math.random() - 0.5) * blurAmount).toFixed(4))
-                };
-            };
-
-            const getPrivacyLabel = (level) => {
-                const labels = {
-                    1: 'Exact location',
-                    2: 'Street level',
-                    3: 'Neighborhood',
-                    4: 'City',
-                    5: 'Region/Country'
-                };
-                return labels[level];
-            };
-
-            const exportAlbum = () => {
-                const exportData = {
-                    title: 'My Travel Journal',
-                    timezone: timezone,
-                    created: new Date().toISOString(),
-                    photos: photos.map(p => ({
-                        timestamp: p.timestamp,
-                        imageData: p.imageData,
-                        blurredLat: blurLocation(p.lat, p.lng, p.privacyLevel).lat,
-                        blurredLng: blurLocation(p.lat, p.lng, p.privacyLevel).lng,
-                        privacyLevel: p.privacyLevel,
-                        privacyLabel: getPrivacyLabel(p.privacyLevel)
-                    }))
-                };
-
-                const dataStr = JSON.stringify(exportData);
-                const dataUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataStr);
-                const exportFileDefaultName = `automapper-${new Date().toISOString().split('T')[0]}.json`;
-
-                const linkElement = document.createElement('a');
-                linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', exportFileDefaultName);
-                linkElement.click();
-            };
-
-            return (
-                <div className="flex flex-col h-screen bg-white">
-                    {/* Header */}
-                    <div className="bg-slate-900 text-white p-4 border-b border-slate-700">
-                        <h1 className="text-lg font-semibold">automapper</h1>
-                        <p className="text-xs text-slate-400 mt-1">Daily photo journal • {timezone}</p>
-                    </div>
-
-                    {/* Main Content */}
-                    <div className="flex-1 overflow-y-auto">
-                        {tab === 'today' && (
-                            <div className="p-4 space-y-4">
-                                {/* Prompt Status */}
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <h2 className="font-semibold text-blue-900 mb-2">Today's Prompt</h2>
-                                    {todayPhoto ? (
-                                        <div className="text-sm text-blue-800">
-                                            <p className="font-medium">Photo captured!</p>
-                                            <p className="text-xs mt-1">{new Date(todayPhoto.timestamp).toLocaleString()}</p>
-                                        </div>
-                                    ) : (
-                                        <div className="text-sm text-blue-800">
-                                            <p className="font-medium">No photo yet today</p>
-                                            {nextPromptTime && (
-                                                <p className="text-xs mt-1">Next prompt: {nextPromptTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Camera Button */}
-                                <button
-                                    onClick={startCamera}
-                                    className="w-full bg-slate-900 text-white py-3 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-slate-800 active:bg-slate-700"
-                                >
-                                    📷 Capture Photo
-                                </button>
-
-                                {/* Today's Photo Preview */}
-                                {todayPhoto && (
-                                    <div className="space-y-2">
-                                        <img 
-                                            src={todayPhoto.imageData} 
-                                            alt="Today" 
-                                            className="w-full rounded-lg cursor-pointer"
-                                            onClick={() => setSelectedPhoto(todayPhoto)}
-                                        />
-                                        <div className="text-xs text-slate-500">
-                                            Privacy: {getPrivacyLabel(todayPhoto.privacyLevel)}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {tab === 'album' && (
-                            <div className="p-4">
-                                <div className="grid grid-cols-2 gap-3">
-                                    {photos.map(photo => (
-                                        <div
-                                            key={photo.id}
-                                            className="relative rounded-lg overflow-hidden cursor-pointer"
-                                            onClick={() => setSelectedPhoto(photo)}
-                                        >
-                                            <img 
-                                                src={photo.imageData} 
-                                                alt={new Date(photo.timestamp).toLocaleDateString()}
-                                                className="w-full aspect-square object-cover"
-                                            />
-                                            <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-medium">
-                                                {photo.privacyLevel}/5
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                {photos.length === 0 && (
-                                    <p className="text-center text-slate-400 py-8">No photos yet. Start capturing!</p>
-                                )}
-                            </div>
-                        )}
-
-                        {tab === 'map' && (
-                            <div className="p-4">
-                                <div className="space-y-3">
-                                    {photos.length === 0 ? (
-                                        <p className="text-center text-slate-400 py-8">No photos to map yet</p>
-                                    ) : (
-                                        photos.map(photo => {
-                                            const blurred = blurLocation(photo.lat, photo.lng, photo.privacyLevel);
-                                            return (
-                                                <div
-                                                    key={photo.id}
-                                                    className="border border-slate-200 rounded-lg p-3 cursor-pointer hover:bg-slate-50"
-                                                    onClick={() => setSelectedPhoto(photo)}
-                                                >
-                                                    <img 
-                                                        src={photo.imageData} 
-                                                        alt="thumbnail"
-                                                        className="w-full h-32 object-cover rounded mb-2"
-                                                    />
-                                                    <div className="flex items-start gap-2">
-                                                        <span>📍</span>
-                                                        <div className="text-sm">
-                                                            <p className="text-slate-900 font-mono text-xs">{blurred.lat.toFixed(2)}°, {blurred.lng.toFixed(2)}°</p>
-                                                            <p className="text-xs text-slate-500">{getPrivacyLabel(photo.privacyLevel)}</p>
-                                                            <p className="text-xs text-slate-400 mt-1">{new Date(photo.timestamp).toLocaleDateString()}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Photo Detail Modal */}
-                    {selectedPhoto && (
-                        <div className="fixed inset-0 bg-black/75 flex items-end z-50" onClick={() => setSelectedPhoto(null)}>
-                            <div className="bg-white w-full rounded-t-2xl p-4 space-y-4 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-semibold text-sm">{new Date(selectedPhoto.timestamp).toLocaleString()}</h3>
-                                    <button onClick={() => setSelectedPhoto(null)} className="text-slate-400 hover:text-slate-600 text-lg">✕</button>
-                                </div>
-
-                                <img src={selectedPhoto.imageData} alt="Full view" className="w-full rounded-lg" />
-
-                                {/* Privacy Slider */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Location Privacy</label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="5"
-                                        value={selectedPhoto.privacyLevel}
-                                        onChange={(e) => updatePrivacy(selectedPhoto.id, parseInt(e.target.value))}
-                                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                                    />
-                                    <div className="flex justify-between text-xs text-slate-500">
-                                        <span>Exact</span>
-                                        <span>{getPrivacyLabel(selectedPhoto.privacyLevel)}</span>
-                                        <span>Country</span>
-                                    </div>
-                                </div>
-
-                                {/* Location Info */}
-                                <div className="bg-slate-50 rounded-lg p-3 space-y-1 text-sm">
-                                    <p className="text-slate-500 text-xs">Captured coordinates</p>
-                                    <p className="font-mono text-slate-900 text-xs">{selectedPhoto.lat.toFixed(6)}, {selectedPhoto.lng.toFixed(6)}</p>
-                                    <p className="text-xs text-slate-400 mt-2">±{Math.round(selectedPhoto.accuracy)}m accuracy</p>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="flex gap-2 pt-4">
-                                    <button
-                                        onClick={() => deletePhoto(selectedPhoto.id)}
-                                        className="flex-1 bg-red-50 text-red-600 py-2 rounded-lg font-medium active:bg-red-100"
-                                    >
-                                        Delete
-                                    </button>
-                                    <button
-                                        onClick={() => setSelectedPhoto(null)}
-                                        className="flex-1 bg-slate-900 text-white py-2 rounded-lg font-medium active:bg-slate-800"
-                                    >
-                                        Done
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Camera Modal */}
-                    {showCamera && (
-                        <div className="fixed inset-0 bg-black z-40 flex flex-col">
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                playsInline
-                                className="flex-1 object-cover"
-                            />
-                            <canvas ref={canvasRef} className="hidden" />
-                            
-                            <div className="bg-black/80 p-4 flex gap-2">
-                                <button
-                                    onClick={stopCamera}
-                                    className="flex-1 bg-slate-700 text-white py-3 rounded-lg font-medium active:bg-slate-600"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={capturePhoto}
-                                    className="flex-1 bg-white text-black py-3 rounded-lg font-medium active:bg-slate-100"
-                                >
-                                    Capture
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Bottom Navigation */}
-                    <div className="border-t border-slate-200 bg-white grid grid-cols-4 gap-1 p-2">
-                        <button
-                            onClick={() => setTab('today')}
-                            className={`py-3 flex flex-col items-center gap-1 rounded ${
-                                tab === 'today' ? 'text-slate-900 bg-slate-100' : 'text-slate-400'
-                            }`}
-                        >
-                            <span className="text-lg">📷</span>
-                            <span className="text-xs font-medium">Today</span>
-                        </button>
-                        <button
-                            onClick={() => setTab('album')}
-                            className={`py-3 flex flex-col items-center gap-1 rounded ${
-                                tab === 'album' ? 'text-slate-900 bg-slate-100' : 'text-slate-400'
-                            }`}
-                        >
-                            <span className="text-lg">🖼️</span>
-                            <span className="text-xs font-medium">Album</span>
-                        </button>
-                        <button
-                            onClick={() => setTab('map')}
-                            className={`py-3 flex flex-col items-center gap-1 rounded ${
-                                tab === 'map' ? 'text-slate-900 bg-slate-100' : 'text-slate-400'
-                            }`}
-                        >
-                            <span className="text-lg">🗺️</span>
-                            <span className="text-xs font-medium">Map</span>
-                        </button>
-                        <button
-                            onClick={exportAlbum}
-                            className="py-3 flex flex-col items-center gap-1 rounded text-slate-400"
-                        >
-                            <span className="text-lg">📤</span>
-                            <span className="text-xs font-medium">Export</span>
-                        </button>
+        <div class="content">
+            <!-- Today Tab -->
+            <div id="today-tab" class="tab-content active">
+                <div class="prompt-box">
+                    <h2>Today's Prompt</h2>
+                    <div id="prompt-status">
+                        <p>Loading...</p>
                     </div>
                 </div>
-            );
-        };
 
-        ReactDOM.render(<DailyPhotoJournal />, document.getElementById('root'));
+                <button class="btn btn-primary" onclick="startCamera()">
+                    📷 Capture Photo
+                </button>
+
+                <div id="today-preview"></div>
+            </div>
+
+            <!-- Album Tab -->
+            <div id="album-tab" class="tab-content">
+                <div id="album-grid" class="album-grid"></div>
+            </div>
+
+            <!-- Map Tab -->
+            <div id="map-tab" class="tab-content">
+                <div id="map-list"></div>
+            </div>
+        </div>
+
+        <!-- Photo Detail Modal -->
+        <div id="photo-modal" class="modal" onclick="if(event.target === this) closeModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 id="modal-timestamp"></h3>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+
+                <img id="modal-image" style="width: 100%; border-radius: 0.5rem; margin-bottom: 1rem;">
+
+                <div class="slider-group">
+                    <label>Location Privacy</label>
+                    <input type="range" id="privacy-slider" min="1" max="5" value="3" onchange="updatePrivacy()">
+                    <div class="slider-labels">
+                        <span>Exact</span>
+                        <span id="privacy-label">Neighborhood</span>
+                        <span>Country</span>
+                    </div>
+                </div>
+
+                <div class="location-info">
+                    <p class="location-label">Captured coordinates</p>
+                    <p class="location-coords" id="modal-coords"></p>
+                    <p class="location-accuracy" id="modal-accuracy"></p>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-danger" onclick="deleteCurrentPhoto()">Delete</button>
+                    <button class="btn-primary" onclick="closeModal()">Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera Modal -->
+        <div id="camera-modal" class="camera-modal">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="camera-controls">
+                <button class="camera-cancel" onclick="stopCamera()">Cancel</button>
+                <button class="camera-capture" onclick="capturePhoto()">Capture</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="nav-btn active" onclick="switchTab('today')">
+                <span class="nav-icon">📷</span>
+                <span>Today</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('album')">
+                <span class="nav-icon">🖼️</span>
+                <span>Album</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('map')">
+                <span class="nav-icon">🗺️</span>
+                <span>Map</span>
+            </button>
+            <button class="nav-btn" onclick="exportAlbum()">
+                <span class="nav-icon">📤</span>
+                <span>Export</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let photos = [];
+        let currentPhoto = null;
+        let nextPromptTime = null;
+        let timezone = '';
+
+        // Initialize
+        function init() {
+            timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('tz-display').textContent = `Daily photo journal • ${timezone}`;
+            
+            loadPhotos();
+            calculateNextPrompt();
+            checkTodayPhoto();
+            updateAllViews();
+        }
+
+        function loadPhotos() {
+            const stored = localStorage.getItem('automapperPhotos');
+            photos = stored ? JSON.parse(stored) : [];
+        }
+
+        function savePhotos() {
+            localStorage.setItem('automapperPhotos', JSON.stringify(photos));
+        }
+
+        function calculateNextPrompt() {
+            const now = new Date();
+            const hours = now.getHours();
+            
+            let nextHour;
+            if (hours >= 22 || hours < 7) {
+                nextHour = 7;
+                now.setDate(now.getDate() + 1);
+            } else {
+                nextHour = Math.floor(Math.random() * (22 - hours)) + hours + 1;
+            }
+            
+            nextPromptTime = new Date(now);
+            nextPromptTime.setHours(nextHour, Math.floor(Math.random() * 60), 0);
+        }
+
+        function checkTodayPhoto() {
+            const today = new Date().toDateString();
+            const todayPhoto = photos.find(p => new Date(p.timestamp).toDateString() === today);
+            updatePromptStatus(todayPhoto);
+        }
+
+        function updatePromptStatus(todayPhoto) {
+            const html = todayPhoto 
+                ? `<p style="font-weight: 600;">Photo captured!</p><p>${new Date(todayPhoto.timestamp).toLocaleString()}</p>`
+                : `<p style="font-weight: 600;">No photo yet today</p><p>${nextPromptTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - Next prompt</p>`;
+            document.getElementById('prompt-status').innerHTML = html;
+        }
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            }).then(stream => {
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                document.getElementById('camera-modal').classList.add('active');
+            }).catch(err => {
+                alert('Camera access denied. Go to Settings > Safari > Camera and enable.');
+            });
+        }
+
+        function stopCamera() {
+            const video = document.getElementById('video');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('camera-modal').classList.remove('active');
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            navigator.geolocation.getCurrentPosition(position => {
+                const photoData = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    imageData: canvas.toDataURL('image/jpeg', 0.85),
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    privacyLevel: 3
+                };
+
+                photos.push(photoData);
+                savePhotos();
+                stopCamera();
+                calculateNextPrompt();
+                checkTodayPhoto();
+                updateAllViews();
+                alert('Photo captured!');
+            }, err => {
+                alert('Location access denied. Go to Settings > Safari > Location and enable.');
+            });
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            event.target.closest('.nav-btn').classList.add('active');
+            
+            updateAllViews();
+        }
+
+        function updateAllViews() {
+            updateTodayView();
+            updateAlbumView();
+            updateMapView();
+        }
+
+        function updateTodayView() {
+            const today = new Date().toDateString();
+            const todayPhoto = photos.find(p => new Date(p.timestamp).toDateString() === today);
+            
+            let html = '';
+            if (todayPhoto) {
+                html = `
+                    <div class="photo-preview">
+                        <img src="${todayPhoto.imageData}" onclick="openPhotoModal(${todayPhoto.id})">
+                        <div class="photo-label">Privacy: ${getPrivacyLabel(todayPhoto.privacyLevel)}</div>
+                    </div>
+                `;
+            }
+            document.getElementById('today-preview').innerHTML = html;
+        }
+
+        function updateAlbumView() {
+            let html = '';
+            if (photos.length === 0) {
+                html = '<div class="empty-state">No photos yet. Start capturing!</div>';
+            } else {
+                html = photos.map(p => `
+                    <div class="album-item" onclick="openPhotoModal(${p.id})">
+                        <img src="${p.imageData}">
+                        <div class="privacy-badge">${p.privacyLevel}/5</div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('album-grid').innerHTML = html;
+        }
+
+        function updateMapView() {
+            let html = '';
+            if (photos.length === 0) {
+                html = '<div class="empty-state">No photos to map yet</div>';
+            } else {
+                html = photos.map(p => {
+                    const blurred = blurLocation(p.lat, p.lng, p.privacyLevel);
+                    return `
+                        <div class="map-item" onclick="openPhotoModal(${p.id})">
+                            <img src="${p.imageData}">
+                            <div class="map-location">
+                                <span class="map-location-icon">📍</span>
+                                <div class="map-location-text">
+                                    <p class="map-location-coords">${blurred.lat.toFixed(2)}°, ${blurred.lng.toFixed(2)}°</p>
+                                    <p class="map-location-privacy">${getPrivacyLabel(p.privacyLevel)}</p>
+                                    <p class="map-location-date">${new Date(p.timestamp).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            document.getElementById('map-list').innerHTML = html;
+        }
+
+        function blurLocation(lat, lng, privacyLevel) {
+            const blurAmount = (6 - privacyLevel) * 0.1;
+            return {
+                lat: parseFloat((lat + (Math.random() - 0.5) * blurAmount).toFixed(4)),
+                lng: parseFloat((lng + (Math.random() - 0.5) * blurAmount).toFixed(4))
+            };
+        }
+
+        function getPrivacyLabel(level) {
+            const labels = { 1: 'Exact location', 2: 'Street level', 3: 'Neighborhood', 4: 'City', 5: 'Region/Country' };
+            return labels[level];
+        }
+
+        function openPhotoModal(photoId) {
+            currentPhoto = photos.find(p => p.id === photoId);
+            if (!currentPhoto) return;
+
+            document.getElementById('modal-timestamp').textContent = new Date(currentPhoto.timestamp).toLocaleString();
+            document.getElementById('modal-image').src = currentPhoto.imageData;
+            document.getElementById('privacy-slider').value = currentPhoto.privacyLevel;
+            updatePrivacyLabel();
+            
+            const blurred = blurLocation(currentPhoto.lat, currentPhoto.lng, currentPhoto.privacyLevel);
+            document.getElementById('modal-coords').textContent = `${currentPhoto.lat.toFixed(6)}, ${currentPhoto.lng.toFixed(6)}`;
+            document.getElementById('modal-accuracy').textContent = `±${Math.round(currentPhoto.accuracy)}m accuracy`;
+            
+            document.getElementById('photo-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('photo-modal').classList.remove('active');
+            currentPhoto = null;
+        }
+
+        function updatePrivacy() {
+            const level = parseInt(document.getElementById('privacy-slider').value);
+            if (currentPhoto) {
+                currentPhoto.privacyLevel = level;
+                savePhotos();
+                updatePrivacyLabel();
+                updateAllViews();
+            }
+        }
+
+        function updatePrivacyLabel() {
+            const level = parseInt(document.getElementById('privacy-slider').value);
+            document.getElementById('privacy-label').textContent = getPrivacyLabel(level);
+        }
+
+        function deleteCurrentPhoto() {
+            if (!currentPhoto) return;
+            photos = photos.filter(p => p.id !== currentPhoto.id);
+            savePhotos();
+            closeModal();
+            updateAllViews();
+        }
+
+        function exportAlbum() {
+            const exportData = {
+                title: 'My Travel Journal',
+                timezone: timezone,
+                created: new Date().toISOString(),
+                photos: photos.map(p => ({
+                    timestamp: p.timestamp,
+                    imageData: p.imageData,
+                    blurredLat: blurLocation(p.lat, p.lng, p.privacyLevel).lat,
+                    blurredLng: blurLocation(p.lat, p.lng, p.privacyLevel).lng,
+                    privacyLevel: p.privacyLevel,
+                    privacyLabel: getPrivacyLabel(p.privacyLevel)
+                }))
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `automapper-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Start app
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
